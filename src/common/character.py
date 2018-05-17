@@ -9,7 +9,7 @@ class Character(object):
     def __init__(self, id_):
         self.id = id_
 
-    def get_kills(self):
+    def get_killmail_ids(self):
         kills = set()
         for page in itertools.count(1):
             result = kb.get_kills(zkbOnly=True,
