@@ -12,10 +12,9 @@ class Character(object):
     def get_killmail_ids(self):
         kills = set()
         for page in itertools.count(1):
-            result = kb.get_kills(zkbOnly=True,
-                                  characterID=str(self.id),
+            result = kb.get_kills(zkbOnly=True, characterID=str(self.id),
                                   page=str(page))
-            if not result:
-                break
+            if not result:  # zkill doesn't have a `next` or
+                break       # other form of proper pagination.
             kills.update({r['killmail_id'] for r in result})
         return kills

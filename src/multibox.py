@@ -48,6 +48,7 @@ def get_kill_info(kill, chars):
 
     return ret
 
+
 if __name__ == '__main__':
     chars_input = [95424317, 92019423, 96021112]
     mbox_res = check_multibox(chars_input)

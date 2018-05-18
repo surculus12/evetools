@@ -4,6 +4,7 @@ HEADERS =  {'User-Agent': 'surculus12@gmail.com'}
 VALID_KWARGS = ['characterID', 'zkbOnly', 'page']
 BASE_URL = 'https://zkillboard.com/api/'
 
+
 def strip_invalid_args(kwargs):
     """ Mostly for the convenience of catching typos...
     """

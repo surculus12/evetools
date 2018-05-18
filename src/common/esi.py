@@ -1,7 +1,9 @@
 import requests
+import csv
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
 from django.db.utils import IntegrityError
+from django.core.exceptions import ObjectDoesNotExist
 from common import models
 
 BASE_URL = 'https://esi.evetech.net/latest/'
@@ -24,6 +26,8 @@ def create_type_db():
 def create_cat(cat_id):
     url_cat = ''.join([BASE_URL, 'universe/categories/', str(cat_id)])
     cat_info = requests_retry_session().get(url_cat).json()  # type: dict
+    if cat_info['published'] == False:
+        return
     try:
         cat_model = models.Category.objects.create(id=cat_id,
                                                    name=cat_info['name'])
@@ -35,16 +39,17 @@ def create_cat(cat_id):
 
 def create_group(group_id, cat_model):
     url_group = ''.join([BASE_URL, 'universe/groups/', str(group_id)])
-    group_info = requests_retry_session().get(url_group).json()  # type: dict
     try:
+        group_model = models.Group.objects.get(id=group_id)
+    except ObjectDoesNotExist:
+        group_info = requests_retry_session().get(url_group).json()  # type: dict
+        if group_info['published'] == False:
+            return
         group_model = models.Group.objects.create(id=group_id,
                                                   name=group_info['name'],
                                                   category=cat_model)
     except IntegrityError:
-        print(str(group_id), 'group already exists')
-        group_model = models.Group.objects.get(id=group_id)
-    for type_id in group_info['types']:
-        create_type(type_id, group_model)
+        pass
 
 def create_type(type_id, group_model):
     url_group = ''.join([BASE_URL, 'universe/types/', str(type_id)])
@@ -54,6 +59,23 @@ def create_type(type_id, group_model):
                                    group=group_model)
     except IntegrityError:
         print(str(type_id), 'type already exists')
+
+
+def create_types_from_csv():
+    with open('invTypes.csv') as types_file:
+        types_reader = csv.DictReader(types_file)
+        for type in types_reader:
+            try:
+                group_model = models.Group.objects.get(id=type['groupID'])
+            except ObjectDoesNotExist:
+                print(type['groupID'], 'group does not exist')
+                continue
+            try:
+                models.Type.objects.create(id=type['typeID'],
+                                           group=group_model,
+                                           name=type['typeName'])
+            except IntegrityError:
+                pass
 
 
 def requests_retry_session(

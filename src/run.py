@@ -7,3 +7,4 @@ if __name__ == '__main__':
     
     from common import esi
     esi.create_type_db()
+    esi.create_types_from_csv()
