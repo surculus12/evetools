@@ -9,6 +9,10 @@ from common import models
 BASE_URL = 'https://esi.evetech.net/latest/'
 
 
+def get_char_id_from_name(name):
+    uri = 'https://esi.evetech.net/latest/search/?categories=character&strict=1&search=' + name
+    return requests_retry_session().get(uri).json()['character'][0]
+
 def get_type(type_id):
     return requests.get(''.join(['https://esi.evetech.net/latest/universe/types/',
                                  str(type_id), '/'])).json()

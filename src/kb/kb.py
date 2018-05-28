@@ -13,8 +13,7 @@ def strip_invalid_args(kwargs):
     return kwargs
 
 
-def get_kills(**kwargs):
-    url = BASE_URL + 'kills/'
+def get(url, kwargs):
     kwargs = strip_invalid_args(kwargs)
     # We don't care much about concat optimization here so v0v
     for key, value in kwargs.items():
@@ -24,3 +23,12 @@ def get_kills(**kwargs):
             url = ''.join([url, key, '/'])
     return requests.get(url, headers=HEADERS).json()
 
+
+def get_kills(**kwargs):
+    url = BASE_URL + 'kills/'
+    return get(url, kwargs)
+
+
+def get_stats(**kwargs):
+    url = BASE_URL + 'stats/'
+    return get(url, kwargs)
